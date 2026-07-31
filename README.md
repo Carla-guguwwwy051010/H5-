@@ -1,6 +1,6 @@
-# Video RBT - Magic Companion
+# VybCall Video - Magic Companion
 
-A modern Video Ring Back Tone (RBT) subscription landing page with 3D carousel, built with Vite + Vanilla JavaScript.
+A modern VybCall Video (Video Ring Back Tone) subscription landing page with 3D carousel, built with Vite + Vanilla JavaScript.
 
 ## ✨ Features
 
@@ -111,7 +111,7 @@ npm run build
 
 ## 📄 License
 
-© 2026 Carrier Video RBT. All rights reserved.
+© 2026 VybCall Video. All rights reserved.
 
 ## 🛠️ Tech Stack
 

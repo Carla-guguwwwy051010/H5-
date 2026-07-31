@@ -8,7 +8,45 @@ export function initGrid() {
     mediaBox.addEventListener('click', () => {
       toggleVideoSound(mediaBox);
     });
+
+    // 确保视频能够播放
+    const video = mediaBox.querySelector('video');
+    if (video) {
+      // 尝试播放视频
+      video.play().catch(err => {
+        console.log('Autoplay prevented, will play on user interaction:', err);
+      });
+
+      // 添加视频加载错误处理
+      video.addEventListener('error', (e) => {
+        console.error('Video failed to load:', video.src, e);
+      });
+
+      video.addEventListener('loadeddata', () => {
+        console.log('Video loaded successfully:', video.src);
+        // 视频加载完成后尝试播放
+        video.play().catch(() => {});
+      });
+    }
   });
+
+  // 使用 Intersection Observer 来优化视频加载
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const video = entry.target.querySelector('video');
+        if (video) {
+          if (entry.isIntersecting) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        }
+      });
+    }, { threshold: 0.5 });
+
+    mediaBoxes.forEach(box => observer.observe(box));
+  }
 }
 
 function toggleVideoSound(mediaBox) {
