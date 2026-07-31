@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Video RBT - Magic Companion</title>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- Floating Mascot -->
+    <div class="mascot-container">
+      <div class="mascot-face">👾</div>
+    </div>
+
+    <!-- Pure English Demo Controller -->
+    <div class="demo-controller">
+      <div class="ctrl-row">
+        <span>User State / Mode:</span>
+        <select id="networkMode">
+          <option value="A">Mode A: New Visitor (SMS OTP)</option>
+          <option value="B">Mode B: Cellular Carrier (1-Click)</option>
+          <option value="C">Mode C: WiFi Broadband (SMS OTP)</option>
+        </select>
+      </div>
+      <div class="ctrl-row">
+        <span>Order Outcome:</span>
+        <select id="resultType">
+          <option value="success">Success</option>
+          <option value="insufficient">Insufficient Balance</option>
+          <option value="error">Network / System Error</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Hero Header -->
+    <div class="hero-section">
+      <div class="price-badge">SPECIAL OFFER • $0.99/WEEK</div>
+      <h1 class="hero-title">Hatch, Set & Enjoy<br>Your Video Tone</h1>
+      <p class="hero-sub">Surprise every caller with glowing magic companions</p>
+    </div>
+
+    <!-- Swipeable 3D Featured Carousel -->
+    <div class="carousel-wrapper" id="carouselWrapper">
+      <div class="carousel-track" id="carouselTrack">
+
+        <div class="carousel-card">
+          <video loop playsinline muted poster="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-laser-lights-background-41551-large.mp4" type="video/mp4">
+          </video>
+        </div>
+
+        <div class="carousel-card active">
+          <video loop playsinline muted poster="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-bright-neon-lights-in-a-cyberpunk-city-41561-large.mp4" type="video/mp4">
+          </video>
+        </div>
+
+        <div class="carousel-card">
+          <video loop playsinline muted poster="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-purple-and-blue-neon-lights-in-motion-41553-large.mp4" type="video/mp4">
+          </video>
+        </div>
+
+        <div class="carousel-card">
+          <video loop playsinline muted poster="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-fluid-animation-of-colorful-colors-41552-large.mp4" type="video/mp4">
+          </video>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Hero CTA Button -->
+    <div class="cta-container">
+      <button class="btn-gold-glow" id="heroSubscribeBtn">SET AS RINGTONE NOW</button>
+    </div>
+
+    <!-- Grid List (12 Pre-set Video Cards with unified CTA) -->
+    <div class="section-title">Featured Collections</div>
+    <div class="grid-container">
+
+      <!-- Card 1 -->
+      <div class="glass-card">
+        <div class="media-box" data-video-toggle>
+          <div class="sound-badge">🔇 Tap Sound</div>
+          <video loop playsinline muted autoplay src="https://assets.mixkit.co/videos/preview/mixkit-abstract-laser-lights-background-41551-large.mp4"></video>
+        </div>
+        <div class="media-info"><div class="media-title">Magic Companion</div><div class="media-sub">Aesthetic • HD</div></div>
+        <button class="btn-gold-glow card-btn subscribe-btn">Subscribe</button>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="glass-card">
+        <div class="media-box" data-video-toggle>
+          <div class="sound-badge">🔇 Tap Sound</div>
+          <video loop playsinline muted autoplay src="https://assets.mixkit.co/videos/preview/mixkit-bright-neon-lights-in-a-cyberpunk-city-41561-large.mp4"></video>
+        </div>
+        <div class="media-info"><div class="media-title">Aurora Sunset</div><div class="media-sub">Pop Tone • 4K</div></div>
+        <button class="btn-gold-glow card-btn subscribe-btn">Subscribe</button>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="glass-card">
+        <div class="media-box" data-video-toggle>
+          <div class="sound-badge">🔇 Tap Sound</div>
+          <video loop playsinline muted autoplay src="https://assets.mixkit.co/videos/preview/mixkit-purple-and-blue-neon-lights-in-motion-41553-large.mp4"></video>
+        </div>
+        <div class="media-info"><div class="media-title">Cyber Horizon</div><div class="media-sub">Vibe • HD</div></div>
+        <button class="btn-gold-glow card-btn subscribe-btn">Subscribe</button>
+      </div>
+
+      <!-- Exception 1: Network Error (Has Unified Subscribe CTA) -->
+      <div class="glass-card">
+        <div class="state-box network-error-box">
+          <span style="font-size:18px;">📡</span>
+          <div class="state-text">Network Error</div>
+          <button style="background:none; border:none; color:var(--accent-gold); font-size:10px; margin-top:4px; text-decoration:underline; cursor:pointer;">Tap to Retry</button>
+        </div>
+        <div class="media-info"><div class="media-title">Spirit Companion</div><div class="media-sub">Offline Cache</div></div>
+        <button class="btn-gold-glow card-btn subscribe-btn">Subscribe</button>
+      </div>
+
+      <!-- Exception 2: Loading Skeleton (Has Unified Subscribe CTA) -->
+      <div class="glass-card">
+        <div class="state-box loading-box">
+          <div class="state-text" style="color:rgba(255,255,255,0.5);">Loading media...</div>
+        </div>
+        <div class="media-info"><div class="media-title">Loading Tone...</div><div class="media-sub">Fetching data</div></div>
+        <button class="btn-gold-glow card-btn subscribe-btn">Subscribe</button>
+      </div>
+
+      <!-- Exception 3: Load Failed (Has Unified Subscribe CTA) -->
+      <div class="glass-card">
+        <div class="state-box failed-box">
+          <span style="font-size:18px;">⚠️</span>
+          <div class="state-text">Load Failed</div>
+        </div>
+        <div class="media-info"><div class="media-title">Glow Spirit</div><div class="media-sub">Unavailable</div></div>
+        <button class="btn-gold-glow card-btn subscribe-btn">Subscribe</button>
+      </div>
+
+      <!-- Card 7 -->
+      <div class="glass-card">
+        <div class="media-box" data-video-toggle>
+          <div class="sound-badge">🔇 Tap Sound</div>
+          <video loop playsinline muted autoplay src="https://assets.mixkit.co/videos/preview/mixkit-fluid-animation-of-colorful-colors-41552-large.mp4"></video>
+        </div>
+        <div class="media-info"><div class="media-title">Celestial Sound</div><div class="media-sub">Relaxing</div></div>
+        <button class="btn-gold-glow card-btn subscribe-btn">Subscribe</button>
+      </div>
+
+      <!-- Card 8 -->
+      <div class="glass-card">
+        <div class="media-box" data-video-toggle>
+          <div class="sound-badge">🔇 Tap Sound</div>
+          <video loop playsinline muted autoplay src="https://assets.mixkit.co/videos/preview/mixkit-abstract-laser-lights-background-41551-large.mp4"></video>
+        </div>
+        <div class="media-info"><div class="media-title">Starlight Echo</div><div class="media-sub">Ambient</div></div>
+        <button class="btn-gold-glow card-btn subscribe-btn">Subscribe</button>
+      </div>
+
+      <!-- Card 9 -->
+      <div class="glass-card">
+        <div class="media-box" data-video-toggle>
+          <div class="sound-badge">🔇 Tap Sound</div>
+          <video loop playsinline muted autoplay src="https://assets.mixkit.co/videos/preview/mixkit-bright-neon-lights-in-a-cyberpunk-city-41561-large.mp4"></video>
+        </div>
+        <div class="media-info"><div class="media-title">Dreamy Hatch</div><div class="media-sub">Fantasy</div></div>
+        <button class="btn-gold-glow card-btn subscribe-btn">Subscribe</button>
+      </div>
+
+      <!-- Card 10 -->
+      <div class="glass-card">
+        <div class="media-box" data-video-toggle>
+          <div class="sound-badge">🔇 Tap Sound</div>
+          <video loop playsinline muted autoplay src="https://assets.mixkit.co/videos/preview/mixkit-purple-and-blue-neon-lights-in-motion-41553-large.mp4"></video>
+        </div>
+        <div class="media-info"><div class="media-title">Cosmic Wave</div><div class="media-sub">Rhythm</div></div>
+        <button class="btn-gold-glow card-btn subscribe-btn">Subscribe</button>
+      </div>
+
+      <!-- Card 11 -->
+      <div class="glass-card">
+        <div class="media-box" data-video-toggle>
+          <div class="sound-badge">🔇 Tap Sound</div>
+          <video loop playsinline muted autoplay src="https://assets.mixkit.co/videos/preview/mixkit-fluid-animation-of-colorful-colors-41552-large.mp4"></video>
+        </div>
+        <div class="media-info"><div class="media-title">Golden Hour</div><div class="media-sub">Chill Out</div></div>
+        <button class="btn-gold-glow card-btn subscribe-btn">Subscribe</button>
+      </div>
+
+      <!-- Card 12 -->
+      <div class="glass-card">
+        <div class="media-box" data-video-toggle>
+          <div class="sound-badge">🔇 Tap Sound</div>
+          <video loop playsinline muted autoplay src="https://assets.mixkit.co/videos/preview/mixkit-abstract-laser-lights-background-41551-large.mp4"></video>
+        </div>
+        <div class="media-info"><div class="media-title">Lunar Glow</div><div class="media-sub">Lofi Beats</div></div>
+        <button class="btn-gold-glow card-btn subscribe-btn">Subscribe</button>
+      </div>
+
+    </div>
+
+    <!-- Footer Compliance -->
+    <div class="footer">
+      <p>Subscription Fee: $0.99/week (Auto-renewal). Service renews automatically until cancelled. You can unsubscribe at any time via carrier support link.</p>
+      <p style="margin-top: 8px;">© 2026 Carrier Video RBT. All rights reserved.</p>
+    </div>
+
+  </div>
+
+  <!-- ==================== Modals ==================== -->
+
+  <!-- SMS OTP Modal -->
+  <div class="modal-overlay" id="otpModal">
+    <div class="modal-glass-card">
+      <div class="modal-title">Enter Verification Code</div>
+      <div class="modal-desc">A 4-digit PIN code has been sent to your mobile phone via SMS.</div>
+      <div class="otp-inputs">
+        <input type="text" class="otp-box" maxlength="1" value="8">
+        <input type="text" class="otp-box" maxlength="1" value="5">
+        <input type="text" class="otp-box" maxlength="1" value="2">
+        <input type="text" class="otp-box" maxlength="1" value="0">
+      </div>
+      <button class="btn-gold-glow" id="confirmOtpBtn" style="height: 44px; font-size: 13px;">Confirm Subscription</button>
+    </div>
+  </div>
+
+  <!-- Loading Modal -->
+  <div class="modal-overlay" id="loadingModal">
+    <div class="modal-glass-card">
+      <div class="modal-title" id="loadingText">Connecting Gateway...</div>
+      <div class="modal-desc">Verifying credentials with operator billing server</div>
+    </div>
+  </div>
+
+  <!-- Order Outcome Modal -->
+  <div class="modal-overlay" id="resultModal">
+    <div class="modal-glass-card">
+      <div class="status-icon" id="resIcon">✓</div>
+      <div class="modal-title" id="resTitle">Subscription Status</div>
+      <div class="modal-desc" id="resDesc">Description goes here</div>
+      <button class="btn-gold-glow" id="resBtn" style="height: 44px; font-size: 13px;">Done</button>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

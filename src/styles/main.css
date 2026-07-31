@@ -1,0 +1,414 @@
+/* ==================== 1. 极光渐变与全局样式 ==================== */
+:root {
+  --bg-gradient: linear-gradient(180deg, #1A0B2E 0%, #311550 40%, #632B6C 70%, #A34E7B 88%, #E58C73 100%);
+  --accent-gold: #FFD05B;
+  --text-main: #FFFFFF;
+  --text-sub: rgba(255, 255, 255, 0.7);
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --card-inner-bg: rgba(20, 10, 35, 0.5);
+  --glow-gold: 0 0 18px rgba(255, 208, 91, 0.5);
+  --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: #1A0B2E;
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.app-container {
+  width: 100%;
+  max-width: 430px;
+  position: relative;
+  padding-bottom: 40px;
+  z-index: 1;
+}
+
+/* 浮动卡通角色 */
+.mascot-container {
+  position: absolute;
+  top: 135px;
+  right: 15px;
+  width: 55px;
+  height: 55px;
+  background: radial-gradient(circle, #FFD05B 0%, #FF60B5 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 25px rgba(255, 208, 91, 0.8);
+  animation: floatAnim 3.5s infinite ease-in-out;
+  z-index: 5;
+}
+.mascot-face { font-size: 24px; }
+
+@keyframes floatAnim {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(5deg); }
+}
+
+/* ==================== Pure English Demo Controller ==================== */
+.demo-controller {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--glass-border);
+  color: var(--text-sub);
+  padding: 8px 12px;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.ctrl-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.demo-controller select {
+  background: #2A1542;
+  color: var(--text-main);
+  border: 1px solid var(--glass-border);
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-size: 10px;
+}
+
+/* ==================== Hero Header KV ==================== */
+.hero-section {
+  padding: 25px 20px 10px;
+  text-align: center;
+}
+.price-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  background: rgba(255, 208, 91, 0.2);
+  border: 1px solid rgba(255, 208, 91, 0.4);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-gold);
+  margin-bottom: 8px;
+}
+.hero-title {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.25;
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFE399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 4px;
+}
+.hero-sub {
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+/* ==================== 滑动 3D 轮播 (Swipeable Carousel) ==================== */
+.carousel-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 15px 0 20px;
+  touch-action: pan-y;
+}
+.carousel-track {
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform;
+}
+.carousel-card {
+  flex: 0 0 130px;
+  height: 180px;
+  margin: 0 10px;
+  border-radius: 18px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0.5;
+  transform: scale(0.85);
+  position: relative;
+  overflow: hidden;
+}
+.carousel-card.active {
+  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(255, 208, 91, 0.4);
+  border: 1px solid rgba(255, 208, 91, 0.8);
+}
+.carousel-card video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==================== 统一的 CTA 呼吸扫光按钮样式 ==================== */
+.btn-gold-glow {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(135deg, #FFD05B 0%, #FFA834 100%);
+  color: #1A0B2E;
+  border: none;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--glow-gold);
+  animation: auraPulse 2.5s infinite ease-in-out;
+}
+
+/* 用于网格卡片内的尺寸微调版本 */
+.btn-gold-glow.card-btn {
+  height: 36px;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.btn-gold-glow::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(60deg, transparent 30%, rgba(255, 255, 255, 0.5) 50%, transparent 70%);
+  transform: rotate(30deg);
+  animation: shine 3.5s infinite;
+}
+
+@keyframes auraPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 12px rgba(255, 208, 91, 0.4); }
+  50% { transform: scale(1.02); box-shadow: 0 0 22px rgba(255, 208, 91, 0.7); }
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) rotate(30deg); }
+  20%, 100% { transform: translateX(100%) rotate(30deg); }
+}
+
+.cta-container {
+  padding: 0 20px 25px;
+}
+
+/* ==================== 网格列表 (Grid Cards) ==================== */
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 0 20px 12px;
+  color: var(--text-main);
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 0 20px 30px;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.media-box {
+  width: 100%;
+  height: 130px;
+  border-radius: 12px;
+  position: relative;
+  margin-bottom: 6px;
+  background-color: var(--card-inner-bg);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.media-box video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sound-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.media-info {
+  padding: 0 2px;
+}
+
+.media-title {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.media-sub {
+  font-size: 10px;
+  color: var(--text-sub);
+}
+
+/* 三种异常状态盒子 */
+.state-box {
+  width: 100%;
+  height: 130px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+  margin-bottom: 6px;
+}
+
+.network-error-box {
+  background: rgba(255, 59, 48, 0.12);
+  border: 1px dashed rgba(255, 59, 48, 0.4);
+}
+
+.loading-box {
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: skeletonLoading 1.5s infinite;
+}
+
+@keyframes skeletonLoading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.failed-box {
+  background: rgba(255, 149, 0, 0.12);
+  border: 1px dashed rgba(255, 149, 0, 0.4);
+}
+
+.state-text {
+  font-size: 10px;
+  color: var(--text-sub);
+  margin-top: 4px;
+}
+
+/* 页脚 */
+.footer {
+  padding: 20px;
+  font-size: 10px;
+  color: var(--text-sub);
+  line-height: 1.5;
+  text-align: center;
+  border-top: 1px solid var(--glass-border);
+}
+
+/* ==================== Modal Popups ==================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 5, 20, 0.8);
+  backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 1000;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-glass-card {
+  width: 85%;
+  max-width: 320px;
+  background: rgba(35, 18, 55, 0.92);
+  border: 1px solid rgba(255, 208, 91, 0.3);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), var(--glow-gold);
+  border-radius: 24px;
+  padding: 25px 20px;
+  text-align: center;
+}
+
+.modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.modal-desc {
+  font-size: 11px;
+  color: var(--text-sub);
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.otp-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.otp-box {
+  width: 42px;
+  height: 48px;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent-gold);
+}
+
+.status-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+.icon-success { background: rgba(52, 199, 89, 0.2); color: #34C759; border: 1px solid rgba(52, 199, 89, 0.4); }
+.icon-insufficient { background: rgba(255, 149, 0, 0.2); color: #FF9500; border: 1px solid rgba(255, 149, 0, 0.4); }
+.icon-failed { background: rgba(255, 59, 48, 0.2); color: #FF3B30; border: 1px solid rgba(255, 59, 48, 0.4); }
