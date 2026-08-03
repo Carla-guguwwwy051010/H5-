@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracking Data Viewer - Video RBT</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #FFD05B 0%, #FF6B9D 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle { color: #888; margin-bottom: 30px; }
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    button {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    button:hover { background: rgba(255, 255, 255, 0.15); }
+    button.primary {
+      background: linear-gradient(135deg, #FFD05B 0%, #FF9A3C 100%);
+      border: none;
+      color: #000;
+      font-weight: 600;
+    }
+    button.danger { background: rgba(255, 59, 48, 0.2); border-color: #FF3B30; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .stat-label { font-size: 12px; color: #888; margin-bottom: 5px; }
+    .stat-value { font-size: 28px; font-weight: 700; color: #FFD05B; }
+    .filter-group {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .filter-group label { font-size: 13px; color: #aaa; margin-right: 10px; }
+    .filter-group select, .filter-group input {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-right: 15px;
+    }
+    .events-table {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: #FFD05B;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    td {
+      padding: 12px;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    tr:hover { background: rgba(255, 255, 255, 0.02); }
+    .event-name {
+      font-weight: 600;
+      color: #4CAF50;
+      font-family: 'Monaco', monospace;
+    }
+    .timestamp { color: #888; font-size: 11px; }
+    .params {
+      font-size: 12px;
+      color: #aaa;
+      max-width: 400px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-right: 5px;
+    }
+    .badge-success { background: rgba(76, 175, 80, 0.2); color: #4CAF50; }
+    .badge-error { background: rgba(255, 59, 48, 0.2); color: #FF3B30; }
+    .badge-info { background: rgba(33, 150, 243, 0.2); color: #2196F3; }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+    .empty-state-icon { font-size: 48px; margin-bottom: 15px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 Tracking Data Viewer</h1>
+    <p class="subtitle">Real-time analytics event monitoring for Video RBT</p>
+
+    <div class="toolbar">
+      <button class="primary" onclick="refreshData()">🔄 Refresh</button>
+      <button onclick="exportData()">📥 Export JSON</button>
+      <button class="danger" onclick="clearData()">🗑️ Clear All</button>
+      <button onclick="window.location.href='/'">← Back to App</button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="filter-group">
+      <label>Filter by Event:</label>
+      <select id="eventFilter" onchange="applyFilter()">
+        <option value="">All Events</option>
+      </select>
+      <label>Search:</label>
+      <input type="text" id="searchInput" placeholder="Search in params..." oninput="applyFilter()">
+    </div>
+
+    <div class="events-table">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 50px;">#</th>
+            <th style="width: 180px;">Event</th>
+            <th style="width: 150px;">Timestamp</th>
+            <th>Parameters</th>
+            <th style="width: 120px;">Session</th>
+          </tr>
+        </thead>
+        <tbody id="eventsTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let allEvents = [];
+    let filteredEvents = [];
+
+    function loadEvents() {
+      try {
+        const stored = localStorage.getItem('user_events');
+        allEvents = stored ? JSON.parse(stored) : [];
+        filteredEvents = [...allEvents];
+        return allEvents;
+      } catch (e) {
+        console.error('Failed to load events:', e);
+        return [];
+      }
+    }
+
+    function renderStats() {
+      const events = allEvents;
+      const statsEl = document.getElementById('stats');
+
+      const totalEvents = events.length;
+      const uniqueEvents = new Set(events.map(e => e.event)).size;
+      const lastEvent = events.length > 0 ? events[events.length - 1] : null;
+      const sessionId = lastEvent ? lastEvent.session_id.split('_')[1] : 'N/A';
+
+      const pageViews = events.filter(e => e.event === 'page_view').length;
+      const subscribeClicks = events.filter(e => e.event === 'subscribe_click').length;
+      const subscriptionSuccess = events.filter(e => e.event === 'subscription_success').length;
+
+      statsEl.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-label">Total Events</div>
+          <div class="stat-value">${totalEvents}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Unique Event Types</div>
+          <div class="stat-value">${uniqueEvents}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Subscribe Clicks</div>
+          <div class="stat-value">${subscribeClicks}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Conversions</div>
+          <div class="stat-value">${subscriptionSuccess}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Conversion Rate</div>
+          <div class="stat-value">${subscribeClicks > 0 ? ((subscriptionSuccess / subscribeClicks) * 100).toFixed(1) : 0}%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Session ID</div>
+          <div class="stat-value" style="font-size: 14px;">${sessionId}</div>
+        </div>
+      `;
+    }
+
+    function populateEventFilter() {
+      const events = allEvents;
+      const uniqueEvents = [...new Set(events.map(e => e.event))].sort();
+      const filterEl = document.getElementById('eventFilter');
+
+      filterEl.innerHTML = '<option value="">All Events</option>';
+      uniqueEvents.forEach(event => {
+        const count = events.filter(e => e.event === event).length;
+        filterEl.innerHTML += `<option value="${event}">${event} (${count})</option>`;
+      });
+    }
+
+    function applyFilter() {
+      const eventFilter = document.getElementById('eventFilter').value;
+      const searchText = document.getElementById('searchInput').value.toLowerCase();
+
+      filteredEvents = allEvents.filter(event => {
+        const matchesEvent = !eventFilter || event.event === eventFilter;
+        const matchesSearch = !searchText || JSON.stringify(event).toLowerCase().includes(searchText);
+        return matchesEvent && matchesSearch;
+      });
+
+      renderTable();
+    }
+
+    function renderTable() {
+      const tableEl = document.getElementById('eventsTable');
+      const events = filteredEvents.slice().reverse(); // 最新的在前
+
+      if (events.length === 0) {
+        tableEl.innerHTML = `
+          <tr><td colspan="5" style="text-align: center; padding: 60px;">
+            <div class="empty-state">
+              <div class="empty-state-icon">📭</div>
+              <div>No tracking events yet. Go to the app and interact with it!</div>
+            </div>
+          </td></tr>
+        `;
+        return;
+      }
+
+      tableEl.innerHTML = events.map((event, index) => {
+        const params = {...event};
+        delete params.event;
+        delete params.timestamp;
+        delete params.time_ms;
+        delete params.session_id;
+        delete params.platform;
+        delete params.userAgent;
+        delete params.screenSize;
+        delete params.viewportSize;
+        delete params.country;
+
+        const paramsStr = Object.keys(params).length > 0
+          ? Object.entries(params).map(([k, v]) => `${k}: ${JSON.stringify(v)}`).join(', ')
+          : '-';
+
+        const badge = event.event.includes('success') ? 'badge-success'
+          : event.event.includes('fail') || event.event.includes('error') ? 'badge-error'
+          : 'badge-info';
+
+        const sessionShort = event.session_id.split('_')[1].substring(0, 8);
+
+        return `
+          <tr>
+            <td style="color: #666;">${filteredEvents.length - index}</td>
+            <td><span class="badge ${badge}">${event.event}</span></td>
+            <td class="timestamp">${new Date(event.timestamp).toLocaleString()}</td>
+            <td class="params">${paramsStr}</td>
+            <td style="font-size: 11px; color: #666;">${sessionShort}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function refreshData() {
+      loadEvents();
+      renderStats();
+      populateEventFilter();
+      applyFilter();
+    }
+
+    function exportData() {
+      const dataStr = JSON.stringify(allEvents, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tracking_data_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      alert(`✅ Exported ${allEvents.length} events`);
+    }
+
+    function clearData() {
+      if (confirm('⚠️ Clear all tracking data? This cannot be undone.')) {
+        localStorage.removeItem('user_events');
+        refreshData();
+        alert('✅ All tracking data cleared');
+      }
+    }
+
+    // 初始化
+    refreshData();
+
+    // 自动刷新（每5秒）
+    setInterval(refreshData, 5000);
+  </script>
+</body>
+</html>

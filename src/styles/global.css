@@ -1,4 +1,5 @@
 /* ==================== 1. 极光渐变与全局样式 ==================== */
+
 :root {
   --bg-gradient: linear-gradient(180deg, #1A0B2E 0%, #311550 40%, #632B6C 70%, #A34E7B 88%, #E58C73 100%);
   --accent-gold: #FFD05B;
@@ -136,8 +137,8 @@ body {
   will-change: transform;
 }
 .carousel-card {
-  flex: 0 0 130px;
-  height: 180px;
+  flex: 0 0 190px;
+  height: 300px;
   margin: 0 10px;
   border-radius: 18px;
   background: var(--glass-bg);
@@ -147,6 +148,7 @@ body {
   transform: scale(0.85);
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 }
 .carousel-card.active {
   opacity: 1;
@@ -261,18 +263,7 @@ body {
   display: block;
 }
 
-.sound-badge {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(4px);
-  color: #fff;
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  pointer-events: none;
-}
+/* 已移除原有的 sound-badge 样式，因为现在使用新的播放提示 */
 
 .media-info {
   padding: 0 2px;

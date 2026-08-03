@@ -1,0 +1,208 @@
+/* ==================== 手机号验证页面样式 ==================== */
+
+/* 全屏页面容器 */
+.page-overlay {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  width: 100%;
+  max-width: 430px;
+  height: 100%;
+  background: #1A0B2E;
+  background-image: var(--bg-gradient);
+  z-index: 2000;
+  overflow-y: auto;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.35s ease;
+}
+
+.page-overlay.active {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.page-inner {
+  padding: 20px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部返回栏 */
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.page-back-btn {
+  width: 38px;
+  height: 38px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  color: var(--text-main);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.page-back-btn:active {
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.page-heading {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* 订购摘要卡片 */
+.order-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 24px;
+}
+
+.order-summary-thumb {
+  width: 48px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--card-inner-bg);
+}
+
+.order-summary-info { flex: 1; min-width: 0; }
+.order-summary-title { font-size: 14px; font-weight: 600; color: var(--text-main); }
+.order-summary-price { font-size: 12px; color: var(--accent-gold); margin-top: 2px; }
+
+/* 表单区块标题 */
+.form-label {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+/* 手机号输入组 */
+.phone-input-group {
+  display: flex;
+  align-items: stretch;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 6px;
+  transition: border-color 0.2s ease;
+}
+
+.phone-input-group.error {
+  border-color: rgba(255, 59, 48, 0.7);
+}
+
+.phone-prefix {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border-right: 1px solid var(--glass-border);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.phone-prefix .flag { font-size: 18px; }
+
+.phone-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding: 14px 12px;
+  font-size: 15px;
+  color: var(--text-main);
+  outline: none;
+  letter-spacing: 0.5px;
+}
+
+.phone-input::placeholder { color: rgba(255, 255, 255, 0.4); }
+
+/* 验证码输入组 */
+.code-input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.code-input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px 12px;
+  font-size: 15px;
+  color: var(--text-main);
+  outline: none;
+  letter-spacing: 2px;
+  transition: border-color 0.2s ease;
+}
+
+.code-input.error { border-color: rgba(255, 59, 48, 0.7); }
+.code-input::placeholder { color: rgba(255, 255, 255, 0.4); letter-spacing: 0.5px; }
+
+.get-code-btn {
+  flex-shrink: 0;
+  min-width: 108px;
+  border: 1px solid rgba(255, 208, 91, 0.5);
+  background: rgba(255, 208, 91, 0.12);
+  color: var(--accent-gold);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0 10px;
+}
+
+.get-code-btn:active { transform: scale(0.97); }
+
+.get-code-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  color: var(--text-sub);
+  border-color: var(--glass-border);
+  background: var(--glass-bg);
+}
+
+/* 错误提示文字 */
+.field-error {
+  font-size: 11px;
+  color: #FF6B60;
+  min-height: 15px;
+  margin-bottom: 16px;
+  padding-left: 4px;
+}
+
+/* 底部确认按钮固定间距 */
+.confirm-wrap {
+  margin-top: auto;
+  padding-top: 24px;
+}

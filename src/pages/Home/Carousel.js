@@ -12,7 +12,7 @@ export function initCarousel() {
   let userInteracted = false;
 
   function updateCarousel() {
-    const cardWidth = 150; // 卡片宽度 + margin
+    const cardWidth = 210; // 卡片宽度(190) + 左右 margin(20)
     const containerWidth = wrapper.offsetWidth;
     // 计算偏移让 active 卡片居中
     const offset = (containerWidth / 2) - (cardWidth / 2) - (currentIndex * cardWidth);
@@ -94,6 +94,26 @@ export function initCarousel() {
 
   function touchEnd() { isDragging = false; }
   function getPositionX(e) { return e.type.includes('touch') ? e.touches[0].clientX : e.clientX; }
+
+  // 点击卡片打开大屏播放器
+  cards.forEach((card) => {
+    card.addEventListener('click', (e) => {
+      // 只有当前激活的卡片才能点击
+      if (card.classList.contains('active')) {
+        const video = card.querySelector('video');
+        if (video && video.src) {
+          // 触发打开大屏播放器的事件
+          const event = new CustomEvent('openVideoPlayer', {
+            detail: {
+              videoSrc: video.src || video.querySelector('source')?.src,
+              videoId: `carousel_${currentIndex}`
+            }
+          });
+          window.dispatchEvent(event);
+        }
+      }
+    });
+  });
 
   // 初始化轮播居中状态
   window.addEventListener('load', updateCarousel);
