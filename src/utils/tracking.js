@@ -7,7 +7,7 @@ const TRACKING_CONFIG = {
   enabled: true,                    // 全局开关
   console: true,                    // 是否打印console
   storage: true,                    // 是否存储到localStorage
-  storageKey: 'user_events',        // localStorage key
+  storageKey: 'video_rbt_events',   // 统一 localStorage key（三页共享）
   maxStorageSize: 200,              // 最多保存200条
   debugMode: true,                  // Debug模式（Demo阶段）
 
@@ -46,13 +46,17 @@ export function track(eventName, eventParams = {}) {
   if (!TRACKING_CONFIG.enabled) return;
 
   const timestamp = Date.now();
+  // 统一嵌套结构：{ event, timestamp, params:{...} }
+  // params 内合并会话信息，session_id 提升到顶层方便读取端使用
   const eventData = {
     event: eventName,
     timestamp: new Date(timestamp).toISOString(),
     time_ms: timestamp,
     session_id: sessionInfo.sessionId,
-    ...sessionInfo,
-    ...eventParams
+    params: {
+      ...sessionInfo,
+      ...eventParams
+    }
   };
 
   // 1. Console输出
@@ -91,16 +95,18 @@ export function track(eventName, eventParams = {}) {
 function saveToStorage(eventData) {
   try {
     const stored = localStorage.getItem(TRACKING_CONFIG.storageKey);
-    let events = stored ? JSON.parse(stored) : [];
+    const data = stored ? JSON.parse(stored) : { events: [] };
+    // 兼容异常/空结构
+    if (!Array.isArray(data.events)) data.events = [];
 
-    events.push(eventData);
+    data.events.push(eventData);
 
     // 限制存储数量
-    if (events.length > TRACKING_CONFIG.maxStorageSize) {
-      events = events.slice(-TRACKING_CONFIG.maxStorageSize);
+    if (data.events.length > TRACKING_CONFIG.maxStorageSize) {
+      data.events = data.events.slice(-TRACKING_CONFIG.maxStorageSize);
     }
 
-    localStorage.setItem(TRACKING_CONFIG.storageKey, JSON.stringify(events));
+    localStorage.setItem(TRACKING_CONFIG.storageKey, JSON.stringify(data));
   } catch (e) {
     console.error('[Tracking] Failed to save to localStorage:', e);
   }
@@ -124,11 +130,55 @@ function simulateSend(eventData) {
 export function getTrackingEvents() {
   try {
     const stored = localStorage.getItem(TRACKING_CONFIG.storageKey);
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) return [];
+    const data = JSON.parse(stored);
+    return Array.isArray(data.events) ? data.events : [];
   } catch (e) {
     console.error('[Tracking] Failed to get events:', e);
     return [];
   }
+}
+
+/**
+ * 统计摘要（供 admin / viewer 复用逻辑参考）
+ * 注意：viewer/admin 为独立 HTML，会内联同一套读取逻辑；此处为应用侧调试用。
+ */
+export function getStats() {
+  const events = getTrackingEvents();
+  const count = (name) => events.filter(e => e.event === name).length;
+  const pageViews = count('page_view');
+  const subscribeClicks = count('subscribe_click') + count('fullscreen_subscribe_click');
+  const success = count('subscription_success');
+
+  // 今日访问（page_view，按本地日期）
+  const today = new Date().toDateString();
+  const todayViews = events.filter(e =>
+    e.event === 'page_view' && new Date(e.timestamp).toDateString() === today
+  ).length;
+
+  return {
+    totalEvents: events.length,
+    todayViews,
+    videoPlays: count('video_play'),
+    subscribeClicks,
+    subscriptionSuccess: success,
+    conversionRate: subscribeClicks > 0 ? +((success / subscribeClicks) * 100).toFixed(1) : 0
+  };
+}
+
+/**
+ * 转化漏斗：page_view → video_play → subscribe_click → verify_success → subscription_success
+ */
+export function getFunnel() {
+  const events = getTrackingEvents();
+  const count = (name) => events.filter(e => e.event === name).length;
+  return [
+    { step: 'page_view', label: 'Page View', value: count('page_view') },
+    { step: 'video_play', label: 'Video Play', value: count('video_play') },
+    { step: 'subscribe_click', label: 'Subscribe Click', value: count('subscribe_click') + count('fullscreen_subscribe_click') },
+    { step: 'verify_success', label: 'Verify Success', value: count('verify_success') },
+    { step: 'subscription_success', label: 'Subscription Success', value: count('subscription_success') }
+  ];
 }
 
 /**

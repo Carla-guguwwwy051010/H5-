@@ -561,34 +561,52 @@
           <span class="live-indicator"></span>
           <span>实时数据面板</span>
         </div>
-        <button class="refresh-btn" onclick="refreshData()">
+        <button class="refresh-btn" onclick="refreshData(event)">
           🔄 刷新数据
         </button>
       </div>
 
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-label">Total Events</div>
-          <div class="stat-value" id="totalEvents">0</div>
-          <div class="stat-detail">累计埋点事件</div>
+          <div class="stat-label">Today Views</div>
+          <div class="stat-value blue" id="todayViews">0</div>
+          <div class="stat-detail">今日访问</div>
         </div>
 
         <div class="stat-card">
-          <div class="stat-label">Page Views</div>
-          <div class="stat-value blue" id="pageViews">0</div>
-          <div class="stat-detail">页面访问次数</div>
+          <div class="stat-label">Video Plays</div>
+          <div class="stat-value" id="videoPlays">0</div>
+          <div class="stat-detail">视频播放次数</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Fullscreen Views</div>
+          <div class="stat-value" id="fullscreenViews">0</div>
+          <div class="stat-detail">大屏播放次数</div>
         </div>
 
         <div class="stat-card">
           <div class="stat-label">Subscribe Clicks</div>
           <div class="stat-value green" id="subscribeClicks">0</div>
-          <div class="stat-detail">订阅按钮点击</div>
+          <div class="stat-detail">订阅点击次数</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Subscriptions</div>
+          <div class="stat-value green" id="subscriptionSuccess">0</div>
+          <div class="stat-detail">成功订购次数</div>
         </div>
 
         <div class="stat-card">
           <div class="stat-label">Conversion Rate</div>
           <div class="stat-value" id="conversionRate">0%</div>
-          <div class="stat-detail">订阅转化率</div>
+          <div class="stat-detail">订阅→成功转化率</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Total Events</div>
+          <div class="stat-value" id="totalEvents">0</div>
+          <div class="stat-detail">累计埋点事件</div>
         </div>
       </div>
 
@@ -707,12 +725,13 @@
 
   <script>
     // ==================== Data Management ====================
-    const STORAGE_KEY = 'user_events';
+    const STORAGE_KEY = 'video_rbt_events';
 
     function getTrackingData() {
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
-        return stored ? JSON.parse(stored) : [];
+        const data = stored ? JSON.parse(stored) : { events: [] };
+        return Array.isArray(data.events) ? data.events : [];
       } catch (e) {
         console.error('Failed to load tracking data:', e);
         return [];
@@ -721,32 +740,55 @@
 
     function calculateStats() {
       const events = getTrackingData();
-      const pageViews = events.filter(e => e.event === 'page_view').length;
-      const subscribeClicks = events.filter(e => e.event === 'cta_click' || e.event === 'subscribe_click').length;
-      const conversionRate = pageViews > 0 ? ((subscribeClicks / pageViews) * 100).toFixed(1) : 0;
+      const count = (name) => events.filter(e => e.event === name).length;
+
+      // 今日访问（按本地日期过滤 page_view）
+      const today = new Date().toDateString();
+      const todayViews = events.filter(e =>
+        e.event === 'page_view' && new Date(e.timestamp).toDateString() === today
+      ).length;
+
+      const videoPlays = count('video_play');
+      const fullscreenViews = count('fullscreen_view');
+      const subscribeClicks = count('subscribe_click') + count('fullscreen_subscribe_click');
+      const subscriptionSuccess = count('subscription_success');
+      const conversionRate = subscribeClicks > 0
+        ? ((subscriptionSuccess / subscribeClicks) * 100).toFixed(1)
+        : 0;
 
       return {
         totalEvents: events.length,
-        pageViews,
+        todayViews,
+        videoPlays,
+        fullscreenViews,
         subscribeClicks,
+        subscriptionSuccess,
         conversionRate: conversionRate + '%'
       };
     }
 
-    function refreshData() {
+    function renderStats() {
       const stats = calculateStats();
-
-      document.getElementById('totalEvents').textContent = stats.totalEvents;
-      document.getElementById('pageViews').textContent = stats.pageViews;
+      document.getElementById('todayViews').textContent = stats.todayViews;
+      document.getElementById('videoPlays').textContent = stats.videoPlays;
+      document.getElementById('fullscreenViews').textContent = stats.fullscreenViews;
       document.getElementById('subscribeClicks').textContent = stats.subscribeClicks;
+      document.getElementById('subscriptionSuccess').textContent = stats.subscriptionSuccess;
       document.getElementById('conversionRate').textContent = stats.conversionRate;
+      document.getElementById('totalEvents').textContent = stats.totalEvents;
+    }
 
-      // Visual feedback
-      const btn = event.target;
-      btn.textContent = '✓ 已刷新';
-      setTimeout(() => {
-        btn.textContent = '🔄 刷新数据';
-      }, 1500);
+    function refreshData(evt) {
+      renderStats();
+
+      // Visual feedback（仅手动点击刷新按钮时）
+      const btn = evt && evt.target;
+      if (btn) {
+        btn.textContent = '✓ 已刷新';
+        setTimeout(() => {
+          btn.textContent = '🔄 刷新数据';
+        }, 1500);
+      }
     }
 
     function exportData() {
@@ -786,11 +828,7 @@
       // Auto-refresh every 5 seconds if user is on this page
       setInterval(() => {
         if (document.visibilityState === 'visible') {
-          const stats = calculateStats();
-          document.getElementById('totalEvents').textContent = stats.totalEvents;
-          document.getElementById('pageViews').textContent = stats.pageViews;
-          document.getElementById('subscribeClicks').textContent = stats.subscribeClicks;
-          document.getElementById('conversionRate').textContent = stats.conversionRate;
+          renderStats();
         }
       }, 5000);
     });

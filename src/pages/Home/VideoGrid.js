@@ -13,14 +13,25 @@ export function initGrid() {
   const modalMuteBtn = document.getElementById('modalMuteBtn');
   const modalPlayPauseBtn = document.getElementById('modalPlayPauseBtn');
 
+  // 大屏底部订购信息区
+  const fsToneName = document.getElementById('fsToneName');
+  const fsSubscribeBtn = document.getElementById('fsSubscribeBtn');
+
+  // 退出挽回弹窗
+  const exitRetentionModal = document.getElementById('exitRetentionModal');
+  const retentionSubscribeBtn = document.getElementById('retentionSubscribeBtn');
+  const retentionContinueBtn = document.getElementById('retentionContinueBtn');
+
   let currentVideoSrc = '';
+  let currentVideoId = '';
+  let currentVideoName = 'Video Ringtone';
   let selectedMuted = true; // 默认静音
   let isPlaying = false;
 
   // 监听顶部轮播的打开大屏事件
   window.addEventListener('openVideoPlayer', (e) => {
-    const { videoSrc, videoId } = e.detail;
-    openVideoPlayer(videoSrc, videoId);
+    const { videoSrc, videoId, videoName } = e.detail;
+    openVideoPlayer(videoSrc, videoId, undefined, videoName);
   });
 
   // 点击图片占位框打开大屏播放器
@@ -28,14 +39,72 @@ export function initGrid() {
     const videoSrc = mediaBox.dataset.videoSrc;
     const posterSrc = mediaBox.dataset.poster;
     const videoId = mediaBox.dataset.videoItem;
+    const videoName = getCardName(mediaBox);
 
     if (!videoSrc) return;
 
-    // 点击打开大屏播放器
+    // 点击封面（自带播放提示）打开大屏预览
     mediaBox.addEventListener('click', () => {
-      openVideoPlayer(videoSrc, videoId, posterSrc);
+      // 埋点：预览点击
+      window.dispatchEvent(new CustomEvent('previewClick', {
+        detail: { videoId, videoName }
+      }));
+      openVideoPlayer(videoSrc, videoId, posterSrc, videoName);
     });
   });
+
+  // 从卡片读取彩铃名称
+  function getCardName(el) {
+    const card = el?.closest ? el.closest('.glass-card') : el;
+    return card?.querySelector('.media-title')?.textContent?.trim() || 'Video Ringtone';
+  }
+
+  // 大屏底部 Subscribe Now → 手机号验证（保持挂载状态供三态复用）
+  if (fsSubscribeBtn) {
+    fsSubscribeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      startSubscribeFromFullscreen();
+    });
+  }
+
+  // 退出挽回：Subscribe Now → 手机号验证
+  if (retentionSubscribeBtn) {
+    retentionSubscribeBtn.addEventListener('click', () => {
+      exitRetentionModal.classList.remove('active');
+      startSubscribeFromFullscreen();
+    });
+  }
+
+  // 退出挽回：继续浏览 → 真正关闭大屏
+  if (retentionContinueBtn) {
+    retentionContinueBtn.addEventListener('click', () => {
+      exitRetentionModal.classList.remove('active');
+      doClosePlayer();
+    });
+  }
+
+  // 从大屏发起订购：检查网络模式，Mode B 一键订购，否则手机验证
+  function startSubscribeFromFullscreen() {
+    window.dispatchEvent(new CustomEvent('fullscreenSubscribeClick', {
+      detail: { videoId: currentVideoId, videoName: currentVideoName }
+    }));
+    doClosePlayer();
+
+    // 检查网络模式（与卡片 Subscribe 逻辑一致）
+    const networkMode = document.getElementById('networkMode')?.value || 'A';
+
+    if (networkMode === 'B') {
+      // Mode B：蜂窝数据用户 → 一键订购
+      window.dispatchEvent(new CustomEvent('directSubscribe', {
+        detail: { toneName: currentVideoName, toneThumb: modalVideo.poster || '' }
+      }));
+    } else {
+      // Mode A / C：WiFi/新访客 → 手机号验证
+      window.dispatchEvent(new CustomEvent('openPhoneVerification', {
+        detail: { toneName: currentVideoName, toneThumb: modalVideo.poster || '' }
+      }));
+    }
+  }
 
   // 音频选项按钮点击
   audioOptionBtns.forEach(btn => {
@@ -73,29 +142,46 @@ export function initGrid() {
     });
   }
 
-  // 关闭播放器
+  // 关闭播放器 → 先弹退出挽回弹窗
   if (closeVideoPlayer) {
-    closeVideoPlayer.addEventListener('click', () => {
-      closePlayer();
+    closeVideoPlayer.addEventListener('click', (e) => {
+      e.stopPropagation();
+      requestClosePlayer();
     });
   }
 
-  // 点击遮罩层关闭
+  // 点击遮罩层 → 弹退出挽回弹窗
   if (videoPlayerModal) {
     videoPlayerModal.addEventListener('click', (e) => {
       if (e.target === videoPlayerModal) {
-        closePlayer();
+        requestClosePlayer();
+      }
+    });
+  }
+
+  // 状态2：点击视频区域切换控制层显隐（Subscribe 常驻不受影响）
+  if (modalVideo) {
+    modalVideo.addEventListener('click', () => {
+      // 仅在播放阶段（音频面板已隐藏）才切换控制层
+      if (audioControlPanel.style.display === 'none') {
+        const controlsVisible = videoPlayerControls.style.display !== 'none';
+        videoPlayerControls.style.display = controlsVisible ? 'none' : 'flex';
       }
     });
   }
 
   // 打开视频播放器
-  function openVideoPlayer(videoSrc, videoId, posterSrc) {
+  function openVideoPlayer(videoSrc, videoId, posterSrc, videoName) {
     currentVideoSrc = videoSrc;
+    currentVideoId = videoId || 'unknown';
+    currentVideoName = videoName || 'Video Ringtone';
 
-    // 派发事件供埋点监听
-    window.dispatchEvent(new CustomEvent('openVideoPlayer', {
-      detail: { videoId, videoSrc, posterSrc }
+    // 填充底部信息区
+    if (fsToneName) fsToneName.textContent = currentVideoName;
+
+    // 派发进入大屏事件供埋点监听（独立事件名，避免与 openVideoPlayer 递归）
+    window.dispatchEvent(new CustomEvent('fullscreenView', {
+      detail: { videoId: currentVideoId, videoName: currentVideoName, videoSrc, posterSrc }
     }));
 
     // 重置状态
@@ -188,8 +274,22 @@ export function initGrid() {
     }
   }
 
-  // 关闭播放器
-  function closePlayer() {
+  // 请求关闭 → 埋点 + 弹出退出挽回弹窗（状态3）
+  function requestClosePlayer() {
+    window.dispatchEvent(new CustomEvent('fullscreenExitClick', {
+      detail: { videoId: currentVideoId, videoName: currentVideoName }
+    }));
+    // 暂停视频但不关闭，等待用户在弹窗中选择
+    if (!modalVideo.paused) {
+      modalVideo.pause();
+      isPlaying = false;
+      if (modalPlayPauseBtn) modalPlayPauseBtn.textContent = '▶';
+    }
+    exitRetentionModal.classList.add('active');
+  }
+
+  // 真正关闭播放器
+  function doClosePlayer() {
     modalVideo.pause();
     modalVideo.currentTime = 0;
     modalVideo.src = '';
@@ -200,6 +300,9 @@ export function initGrid() {
     // 清理背景图片
     const container = document.querySelector('.video-player-container');
     container.style.backgroundImage = 'none';
+
+    // 重置控制层与信息区，避免下次打开残留
+    videoPlayerControls.style.display = 'none';
 
     videoPlayerModal.classList.remove('active');
   }

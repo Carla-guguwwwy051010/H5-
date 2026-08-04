@@ -60,6 +60,38 @@
     }
     .stat-label { font-size: 12px; color: #888; margin-bottom: 5px; }
     .stat-value { font-size: 28px; font-weight: 700; color: #FFD05B; }
+    .funnel-section {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .funnel-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+    .funnel-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .funnel-label { width: 160px; font-size: 13px; color: #ccc; flex-shrink: 0; }
+    .funnel-bar-wrap { flex: 1; background: rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; height: 28px; }
+    .funnel-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #FFD05B 0%, #FF9A3C 100%);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 8px;
+      color: #000;
+      font-size: 12px;
+      font-weight: 700;
+      min-width: 28px;
+      transition: width 0.4s ease;
+    }
+    .funnel-rate { width: 70px; text-align: right; font-size: 12px; color: #888; flex-shrink: 0; }
+
     .filter-group {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -149,6 +181,11 @@
 
     <div class="stats" id="stats"></div>
 
+    <div class="funnel-section">
+      <div class="funnel-title">Conversion Funnel</div>
+      <div id="funnel"></div>
+    </div>
+
     <div class="filter-group">
       <label>Filter by Event:</label>
       <select id="eventFilter" onchange="applyFilter()">
@@ -178,10 +215,14 @@
     let allEvents = [];
     let filteredEvents = [];
 
+    // 统一数据源 key（三页共享）
+    const STORAGE_KEY = 'video_rbt_events';
+
     function loadEvents() {
       try {
-        const stored = localStorage.getItem('user_events');
-        allEvents = stored ? JSON.parse(stored) : [];
+        const stored = localStorage.getItem(STORAGE_KEY);
+        const data = stored ? JSON.parse(stored) : { events: [] };
+        allEvents = Array.isArray(data.events) ? data.events : [];
         filteredEvents = [...allEvents];
         return allEvents;
       } catch (e) {
@@ -197,10 +238,10 @@
       const totalEvents = events.length;
       const uniqueEvents = new Set(events.map(e => e.event)).size;
       const lastEvent = events.length > 0 ? events[events.length - 1] : null;
-      const sessionId = lastEvent ? lastEvent.session_id.split('_')[1] : 'N/A';
+      const sessionId = lastEvent && lastEvent.session_id ? lastEvent.session_id.split('_')[1] : 'N/A';
 
       const pageViews = events.filter(e => e.event === 'page_view').length;
-      const subscribeClicks = events.filter(e => e.event === 'subscribe_click').length;
+      const subscribeClicks = events.filter(e => e.event === 'subscribe_click' || e.event === 'fullscreen_subscribe_click').length;
       const subscriptionSuccess = events.filter(e => e.event === 'subscription_success').length;
 
       statsEl.innerHTML = `
@@ -273,16 +314,9 @@
       }
 
       tableEl.innerHTML = events.map((event, index) => {
-        const params = {...event};
-        delete params.event;
-        delete params.timestamp;
-        delete params.time_ms;
-        delete params.session_id;
-        delete params.platform;
-        delete params.userAgent;
-        delete params.screenSize;
-        delete params.viewportSize;
-        delete params.country;
+        // 展示业务参数，过滤掉会话级公共字段
+        const params = { ...(event.params || {}) };
+        ['platform', 'userAgent', 'screenSize', 'viewportSize', 'country', 'sessionId', 'startTime'].forEach(k => delete params[k]);
 
         const paramsStr = Object.keys(params).length > 0
           ? Object.entries(params).map(([k, v]) => `${k}: ${JSON.stringify(v)}`).join(', ')
@@ -292,7 +326,7 @@
           : event.event.includes('fail') || event.event.includes('error') ? 'badge-error'
           : 'badge-info';
 
-        const sessionShort = event.session_id.split('_')[1].substring(0, 8);
+        const sessionShort = event.session_id ? event.session_id.split('_')[1].substring(0, 8) : 'N/A';
 
         return `
           <tr>
@@ -306,9 +340,35 @@
       }).join('');
     }
 
+    function renderFunnel() {
+      const count = (name) => allEvents.filter(e => e.event === name).length;
+      const steps = [
+        { label: 'Page View', value: count('page_view') },
+        { label: 'Video Play', value: count('video_play') },
+        { label: 'Subscribe Click', value: count('subscribe_click') + count('fullscreen_subscribe_click') },
+        { label: 'Verify Success', value: count('verify_success') },
+        { label: 'Subscription Success', value: count('subscription_success') }
+      ];
+      const top = steps[0].value || 1;
+      const funnelEl = document.getElementById('funnel');
+      funnelEl.innerHTML = steps.map((s, i) => {
+        const widthPct = Math.max((s.value / top) * 100, s.value > 0 ? 4 : 0);
+        const prev = i === 0 ? null : steps[i - 1].value;
+        const rate = prev && prev > 0 ? ((s.value / prev) * 100).toFixed(0) + '%' : (i === 0 ? '—' : '0%');
+        return `
+          <div class="funnel-row">
+            <div class="funnel-label">${i + 1}. ${s.label}</div>
+            <div class="funnel-bar-wrap"><div class="funnel-bar" style="width: ${widthPct}%;">${s.value}</div></div>
+            <div class="funnel-rate">${rate}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
     function refreshData() {
       loadEvents();
       renderStats();
+      renderFunnel();
       populateEventFilter();
       applyFilter();
     }
@@ -327,7 +387,7 @@
 
     function clearData() {
       if (confirm('⚠️ Clear all tracking data? This cannot be undone.')) {
-        localStorage.removeItem('user_events');
+        localStorage.removeItem(STORAGE_KEY);
         refreshData();
         alert('✅ All tracking data cleared');
       }

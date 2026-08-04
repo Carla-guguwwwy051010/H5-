@@ -120,10 +120,19 @@ function initSubscribeTracking() {
       const titleEl = card?.querySelector('.media-title');
       const videoId = titleEl?.textContent?.trim().replace(/\s+/g, '_').toLowerCase() || 'unknown';
 
+      const videoName = titleEl?.textContent?.trim() || 'Video Ringtone';
+
       track('subscribe_click', {
         video_id: videoId,
         source: 'recommend_grid',
         position: index + 1
+      });
+
+      // 新增：列表卡片订购埋点
+      track('card_subscribe_click', {
+        video_id: videoId,
+        video_name: videoName,
+        position: 'card'
       });
     });
   });
@@ -151,13 +160,42 @@ export function initVideoPlayerTracking() {
   const playPauseBtn = document.getElementById('modalPlayPauseBtn');
 
   let currentVideoId = null;
+  let currentVideoName = null;
 
-  // 监听打开播放器事件
-  window.addEventListener('openVideoPlayer', (e) => {
+  // 进入大屏播放埋点
+  window.addEventListener('fullscreenView', (e) => {
     currentVideoId = e.detail?.videoId || 'unknown';
+    currentVideoName = e.detail?.videoName || 'Video Ringtone';
 
-    track('video_fullscreen_click', {
-      video_id: currentVideoId
+    track('fullscreen_view', {
+      video_id: currentVideoId,
+      video_name: currentVideoName,
+      timestamp: Date.now()
+    });
+  });
+
+  // 大屏 Subscribe Now 点击埋点
+  window.addEventListener('fullscreenSubscribeClick', (e) => {
+    track('fullscreen_subscribe_click', {
+      video_id: e.detail?.videoId || currentVideoId || 'unknown',
+      video_name: e.detail?.videoName || currentVideoName || 'Video Ringtone',
+      position: 'fullscreen'
+    });
+  });
+
+  // 退出大屏埋点
+  window.addEventListener('fullscreenExitClick', (e) => {
+    track('fullscreen_exit_click', {
+      video_id: e.detail?.videoId || currentVideoId || 'unknown',
+      video_name: e.detail?.videoName || currentVideoName || 'Video Ringtone'
+    });
+  });
+
+  // 卡片 Preview 点击埋点
+  window.addEventListener('previewClick', (e) => {
+    track('preview_click', {
+      video_id: e.detail?.videoId || 'unknown',
+      video_name: e.detail?.videoName || 'Video Ringtone'
     });
   });
 
