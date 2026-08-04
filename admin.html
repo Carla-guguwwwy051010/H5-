@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VybCall Video - Product Center</title>
+  <style>
+    /* ==================== Design Tokens ==================== */
+    :root {
+      --bg-gradient: linear-gradient(180deg, #1A0B2E 0%, #311550 40%, #632B6C 70%, #A34E7B 88%, #E58C73 100%);
+      --accent-gold: #FFD05B;
+      --accent-green: #4CD964;
+      --accent-blue: #007AFF;
+      --text-main: #FFFFFF;
+      --text-sub: rgba(255, 255, 255, 0.7);
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.18);
+      --glow-gold: 0 0 20px rgba(255, 208, 91, 0.5);
+      --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    }
+
+    /* ==================== Base Styles ==================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: #1A0B2E;
+      background-image: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 40px 20px 80px;
+    }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    /* ==================== Header ==================== */
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .header-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      margin-bottom: 16px;
+      background: rgba(255, 208, 91, 0.15);
+      border: 1px solid rgba(255, 208, 91, 0.4);
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--accent-gold);
+      text-transform: uppercase;
+    }
+
+    .header-title {
+      font-size: clamp(28px, 5vw, 38px);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFE399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-subtitle {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-bottom: 32px;
+    }
+
+    /* ==================== Project Status ==================== */
+    .project-status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .status-item {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      border-radius: 12px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .status-label {
+      color: var(--text-sub);
+      font-weight: 500;
+    }
+
+    .status-value {
+      color: var(--accent-gold);
+      font-weight: 700;
+    }
+
+    .module-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .module-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-main);
+    }
+
+    .module-check::before {
+      content: '✓';
+      color: var(--accent-green);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    /* ==================== Real-time Data Panel ==================== */
+    .data-panel {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 48px;
+    }
+
+    .data-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .data-panel-title {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .live-indicator {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    .refresh-btn {
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .refresh-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--accent-gold);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-bottom: 4px;
+    }
+
+    .stat-value.green {
+      color: var(--accent-green);
+    }
+
+    .stat-value.blue {
+      color: var(--accent-blue);
+    }
+
+    .stat-detail {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    /* ==================== Quick Actions ==================== */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--accent-gold);
+      transform: translateY(-2px);
+    }
+
+    .action-btn.danger:hover {
+      border-color: #FF3B30;
+      background: rgba(255, 59, 48, 0.15);
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, rgba(255, 208, 91, 0.2), rgba(255, 154, 52, 0.2));
+      border-color: var(--accent-gold);
+    }
+
+    .action-btn .emoji {
+      font-size: 18px;
+    }
+
+    .action-btn.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      position: relative;
+    }
+
+    .action-btn.disabled::after {
+      content: 'Coming Soon';
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      padding: 2px 8px;
+      background: var(--accent-blue);
+      border-radius: 6px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* ==================== Section ==================== */
+    .section {
+      margin-bottom: 48px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .section-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 208, 91, 0.2);
+      border: 2px solid rgba(255, 208, 91, 0.4);
+      color: var(--accent-gold);
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* ==================== Cards ==================== */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 208, 91, 0.5);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+      line-height: 1;
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text-main);
+    }
+
+    .card-description {
+      font-size: 13px;
+      color: var(--text-sub);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+
+    .card-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      height: 48px;
+      background: linear-gradient(135deg, #FFD05B 0%, #FFA834 100%);
+      color: #1A0B2E;
+      border: none;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--glow-gold);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card-button:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 30px rgba(255, 208, 91, 0.7);
+    }
+
+    .card-button:active {
+      transform: scale(0.98);
+    }
+
+    .card-button::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(60deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%);
+      transform: rotate(30deg);
+      animation: shine 3.5s infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%) rotate(30deg); }
+      20%, 100% { transform: translateX(100%) rotate(30deg); }
+    }
+
+    /* ==================== Document List ==================== */
+    .doc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .doc-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 18px 22px;
+      color: var(--text-main);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .doc-item:hover {
+      border-color: rgba(255, 208, 91, 0.6);
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateX(4px);
+    }
+
+    .doc-emoji {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .doc-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .doc-name {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .doc-path {
+      font-size: 11px;
+      color: var(--text-sub);
+      font-family: 'Monaco', 'Consolas', monospace;
+    }
+
+    .doc-arrow {
+      font-size: 20px;
+      color: var(--accent-gold);
+    }
+
+    /* ==================== Footer ==================== */
+    .footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--glass-border);
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    /* ==================== Responsive ==================== */
+    @media (max-width: 768px) {
+      body {
+        padding: 24px 16px 60px;
+      }
+
+      .header {
+        margin-bottom: 32px;
+      }
+
+      .header-title {
+        font-size: 28px;
+      }
+
+      .project-status {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .status-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        margin-bottom: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ==================== Header ==================== -->
+    <header class="header">
+      <div class="header-badge">Product Center</div>
+      <h1 class="header-title">VybCall Video Product Center</h1>
+      <p class="header-subtitle">AI-powered Video Ringtone Subscription Demo</p>
+
+      <!-- Project Status -->
+      <div class="project-status">
+        <div class="status-item">
+          <span class="status-label">Version:</span>
+          <span class="status-value">v1.1.0</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Modules:</span>
+          <div class="module-list">
+            <span class="module-check">Video RBT H5 Flow</span>
+            <span class="module-check">User Tracking System</span>
+            <span class="module-check">Analytics Dashboard</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==================== Real-time Data Panel ==================== -->
+    <div class="data-panel">
+      <div class="data-panel-header">
+        <div class="data-panel-title">
+          <span class="live-indicator"></span>
+          <span>实时数据面板</span>
+        </div>
+        <button class="refresh-btn" onclick="refreshData()">
+          🔄 刷新数据
+        </button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Events</div>
+          <div class="stat-value" id="totalEvents">0</div>
+          <div class="stat-detail">累计埋点事件</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Page Views</div>
+          <div class="stat-value blue" id="pageViews">0</div>
+          <div class="stat-detail">页面访问次数</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Subscribe Clicks</div>
+          <div class="stat-value green" id="subscribeClicks">0</div>
+          <div class="stat-detail">订阅按钮点击</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Conversion Rate</div>
+          <div class="stat-value" id="conversionRate">0%</div>
+          <div class="stat-detail">订阅转化率</div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <button class="action-btn primary" onclick="openDemoA()">
+          <span class="emoji">🚀</span>
+          <span>打开A版 Demo</span>
+        </button>
+        <button class="action-btn disabled" onclick="openDemoB()">
+          <span class="emoji">✨</span>
+          <span>打开B版 Demo</span>
+        </button>
+        <button class="action-btn" onclick="exportData()">
+          <span class="emoji">📥</span>
+          <span>导出数据</span>
+        </button>
+        <button class="action-btn danger" onclick="clearData()">
+          <span class="emoji">🗑️</span>
+          <span>清空数据</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== Section 1: Product Demo ==================== -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <h2 class="section-title">Product Demo</h2>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">📱</div>
+          <h3 class="card-title">Product Demo</h3>
+          <p class="card-description">体验完整视频彩铃订购流程</p>
+          <a href="./index.html" class="card-button">
+            Open H5 Demo
+            <span>→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== Section 2: Analytics Dashboard ==================== -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <h2 class="section-title">Analytics Dashboard</h2>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">📊</div>
+          <h3 class="card-title">Analytics Dashboard</h3>
+          <p class="card-description">查看用户行为数据和转化分析</p>
+          <a href="./analytics/viewer.html" class="card-button">
+            Open Dashboard
+            <span>→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== Section 3: Product Documents ==================== -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <h2 class="section-title">Product Documents</h2>
+      </div>
+
+      <div class="doc-list">
+        <a href="./README.md" class="doc-item">
+          <span class="doc-emoji">📖</span>
+          <div class="doc-info">
+            <div class="doc-name">README</div>
+            <div class="doc-path">README.md</div>
+          </div>
+          <span class="doc-arrow">›</span>
+        </a>
+
+        <a href="./docs/TRACKING.md" class="doc-item">
+          <span class="doc-emoji">📈</span>
+          <div class="doc-info">
+            <div class="doc-name">TRACKING</div>
+            <div class="doc-path">docs/TRACKING.md</div>
+          </div>
+          <span class="doc-arrow">›</span>
+        </a>
+
+        <a href="./docs/PROJECT_ANALYSIS.md" class="doc-item">
+          <span class="doc-emoji">🔍</span>
+          <div class="doc-info">
+            <div class="doc-name">PROJECT_ANALYSIS</div>
+            <div class="doc-path">docs/PROJECT_ANALYSIS.md</div>
+          </div>
+          <span class="doc-arrow">›</span>
+        </a>
+
+        <a href="./docs/DELIVERY.md" class="doc-item">
+          <span class="doc-emoji">📦</span>
+          <div class="doc-info">
+            <div class="doc-name">DELIVERY</div>
+            <div class="doc-path">docs/DELIVERY.md</div>
+          </div>
+          <span class="doc-arrow">›</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ==================== Footer ==================== -->
+    <footer class="footer">
+      <p>© 2026 VybCall Video · Built with 💜 for modern mobile web experiences</p>
+    </footer>
+
+  </div>
+
+  <script>
+    // ==================== Data Management ====================
+    const STORAGE_KEY = 'user_events';
+
+    function getTrackingData() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        return stored ? JSON.parse(stored) : [];
+      } catch (e) {
+        console.error('Failed to load tracking data:', e);
+        return [];
+      }
+    }
+
+    function calculateStats() {
+      const events = getTrackingData();
+      const pageViews = events.filter(e => e.event === 'page_view').length;
+      const subscribeClicks = events.filter(e => e.event === 'cta_click' || e.event === 'subscribe_click').length;
+      const conversionRate = pageViews > 0 ? ((subscribeClicks / pageViews) * 100).toFixed(1) : 0;
+
+      return {
+        totalEvents: events.length,
+        pageViews,
+        subscribeClicks,
+        conversionRate: conversionRate + '%'
+      };
+    }
+
+    function refreshData() {
+      const stats = calculateStats();
+
+      document.getElementById('totalEvents').textContent = stats.totalEvents;
+      document.getElementById('pageViews').textContent = stats.pageViews;
+      document.getElementById('subscribeClicks').textContent = stats.subscribeClicks;
+      document.getElementById('conversionRate').textContent = stats.conversionRate;
+
+      // Visual feedback
+      const btn = event.target;
+      btn.textContent = '✓ 已刷新';
+      setTimeout(() => {
+        btn.textContent = '🔄 刷新数据';
+      }, 1500);
+    }
+
+    function exportData() {
+      const events = getTrackingData();
+      const dataStr = JSON.stringify(events, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `vybcall_tracking_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      alert(`✓ 已导出 ${events.length} 条数据`);
+    }
+
+    function clearData() {
+      if (confirm('⚠️ 确定要清空所有tracking数据吗？此操作不可恢复。')) {
+        localStorage.removeItem(STORAGE_KEY);
+        refreshData();
+        alert('✓ 数据已清空');
+      }
+    }
+
+    function openDemoA() {
+      window.open('./index.html', '_blank');
+    }
+
+    function openDemoB() {
+      alert('🚧 B版 Demo 正在开发中，敬请期待！');
+    }
+
+    // ==================== Auto-refresh on load ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      refreshData();
+
+      // Auto-refresh every 5 seconds if user is on this page
+      setInterval(() => {
+        if (document.visibilityState === 'visible') {
+          const stats = calculateStats();
+          document.getElementById('totalEvents').textContent = stats.totalEvents;
+          document.getElementById('pageViews').textContent = stats.pageViews;
+          document.getElementById('subscribeClicks').textContent = stats.subscribeClicks;
+          document.getElementById('conversionRate').textContent = stats.conversionRate;
+        }
+      }, 5000);
+    });
+
+    // Listen for storage changes from other tabs
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY) {
+        refreshData();
+      }
+    });
+  </script>
+</body>
+</html>

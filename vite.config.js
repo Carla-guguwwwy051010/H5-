@@ -9,7 +9,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        viewer: resolve(__dirname, 'analytics/viewer.html')
+        viewer: resolve(__dirname, 'analytics/viewer.html'),
+        admin: resolve(__dirname, 'admin.html')
       },
       output: {
         manualChunks: undefined
