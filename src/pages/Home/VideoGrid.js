@@ -1,17 +1,25 @@
 /* ==================== 双列彩铃推荐区域（竖向长方形+大屏播放器） ==================== */
 
 export function initGrid() {
+  console.log('initGrid called');
+
   // 为所有带 data-video-item 属性的 media-box 添加交互
   const mediaBoxes = document.querySelectorAll('[data-video-item]');
   const videoPlayerModal = document.getElementById('videoPlayerModal');
   const modalVideo = document.getElementById('modalVideo');
   const closeVideoPlayer = document.getElementById('closeVideoPlayer');
-  const audioControlPanel = document.getElementById('audioControlPanel');
   const videoPlayerControls = document.getElementById('videoPlayerControls');
-  const startPlayBtn = document.getElementById('startPlayBtn');
-  const audioOptionBtns = document.querySelectorAll('.audio-option-btn');
   const modalMuteBtn = document.getElementById('modalMuteBtn');
   const modalPlayPauseBtn = document.getElementById('modalPlayPauseBtn');
+
+  console.log('Elements check:', {
+    videoPlayerModal: !!videoPlayerModal,
+    modalVideo: !!modalVideo,
+    closeVideoPlayer: !!closeVideoPlayer,
+    videoPlayerControls: !!videoPlayerControls,
+    modalMuteBtn: !!modalMuteBtn,
+    modalPlayPauseBtn: !!modalPlayPauseBtn
+  });
 
   // 大屏底部订购信息区
   const fsToneName = document.getElementById('fsToneName');
@@ -25,7 +33,6 @@ export function initGrid() {
   let currentVideoSrc = '';
   let currentVideoId = '';
   let currentVideoName = 'Video Ringtone';
-  let selectedMuted = true; // 默认静音
   let isPlaying = false;
 
   // 监听顶部轮播的打开大屏事件
@@ -106,40 +113,28 @@ export function initGrid() {
     }
   }
 
-  // 音频选项按钮点击
-  audioOptionBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      // 移除其他按钮的选中状态
-      audioOptionBtns.forEach(b => b.classList.remove('selected'));
-      // 添加选中状态
-      btn.classList.add('selected');
-      // 获取选中的静音状态
-      selectedMuted = btn.dataset.muted === 'true';
-    });
-  });
-
-  // 默认选中静音选项
-  audioOptionBtns[0].classList.add('selected');
-
-  // 开始播放按钮
-  if (startPlayBtn) {
-    startPlayBtn.addEventListener('click', () => {
-      startPlayback();
-    });
-  }
-
   // 静音按钮（播放中）
   if (modalMuteBtn) {
-    modalMuteBtn.addEventListener('click', () => {
+    console.log('Mute button found:', modalMuteBtn);
+    modalMuteBtn.addEventListener('click', (e) => {
+      console.log('Mute button clicked!');
+      e.stopPropagation();
       toggleMute();
     });
+  } else {
+    console.error('Mute button NOT found!');
   }
 
   // 播放/暂停按钮
   if (modalPlayPauseBtn) {
-    modalPlayPauseBtn.addEventListener('click', () => {
+    console.log('Play/Pause button found:', modalPlayPauseBtn);
+    modalPlayPauseBtn.addEventListener('click', (e) => {
+      console.log('Play/Pause button clicked!');
+      e.stopPropagation();
       togglePlayPause();
     });
+  } else {
+    console.error('Play/Pause button NOT found!');
   }
 
   // 关闭播放器 → 先弹退出挽回弹窗
@@ -162,11 +157,9 @@ export function initGrid() {
   // 状态2：点击视频区域切换控制层显隐（Subscribe 常驻不受影响）
   if (modalVideo) {
     modalVideo.addEventListener('click', () => {
-      // 仅在播放阶段（音频面板已隐藏）才切换控制层
-      if (audioControlPanel.style.display === 'none') {
-        const controlsVisible = videoPlayerControls.style.display !== 'none';
-        videoPlayerControls.style.display = controlsVisible ? 'none' : 'flex';
-      }
+      // 切换控制层显隐
+      const controlsVisible = videoPlayerControls.style.display !== 'none';
+      videoPlayerControls.style.display = controlsVisible ? 'none' : 'flex';
     });
   }
 
@@ -184,11 +177,6 @@ export function initGrid() {
       detail: { videoId: currentVideoId, videoName: currentVideoName, videoSrc, posterSrc }
     }));
 
-    // 重置状态
-    selectedMuted = true;
-    audioOptionBtns.forEach(b => b.classList.remove('selected'));
-    audioOptionBtns[0].classList.add('selected');
-
     const container = document.querySelector('.video-player-container');
 
     // 使用静态图片作为背景占位（播放前展示）
@@ -201,51 +189,34 @@ export function initGrid() {
       container.style.backgroundImage = 'none';
     }
 
-    // 设置视频源（先不显示视频画面，等用户选择音频后播放）
+    // 设置视频源并立即静音自动播放
     modalVideo.style.display = 'block';
     modalVideo.src = videoSrc;
-    modalVideo.muted = true;
+    modalVideo.muted = true;  // 默认静音
     modalVideo.loop = true;
-
-    // 显示音频控制面板，让用户先选择静音/有声
-    audioControlPanel.style.display = 'block';
-    videoPlayerControls.style.display = 'none';
 
     // 显示 Modal
     videoPlayerModal.classList.add('active');
 
-    // 埋点：视频曝光（大屏）
-    trackVideoExposure(videoId, 'fullscreen');
-  }
-
-  // 开始播放
-  function startPlayback() {
-    // 隐藏音频控制面板
-    audioControlPanel.style.display = 'none';
-
-    // 应用用户选择的静音状态
-    modalVideo.muted = selectedMuted;
-
-    // 更新静音按钮
-    if (modalMuteBtn) {
-      modalMuteBtn.textContent = selectedMuted ? '🔇' : '🔊';
-    }
-
-    // 播放视频
+    // 立即播放视频
     modalVideo.play()
       .then(() => {
         isPlaying = true;
         // 显示播放控制条
         videoPlayerControls.style.display = 'flex';
-        // 更新播放按钮
-        if (modalPlayPauseBtn) {
-          modalPlayPauseBtn.textContent = '⏸';
-        }
+        console.log('Video playing, controls display:', videoPlayerControls.style.display);
+        console.log('Controls visible:', window.getComputedStyle(videoPlayerControls).display);
+        // 更新按钮状态
+        if (modalMuteBtn) modalMuteBtn.textContent = '🔇';
+        if (modalPlayPauseBtn) modalPlayPauseBtn.textContent = '⏸';
       })
       .catch(err => {
         console.error('Failed to play video:', err);
         showToast('Failed to play video');
       });
+
+    // 埋点：视频曝光（大屏）
+    trackVideoExposure(videoId, 'fullscreen');
   }
 
   // 切换静音
@@ -259,6 +230,7 @@ export function initGrid() {
 
   // 切换播放/暂停
   function togglePlayPause() {
+    console.log('togglePlayPause called, paused:', modalVideo.paused);
     if (modalVideo.paused) {
       modalVideo.play().catch(() => {});
       isPlaying = true;

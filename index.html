@@ -40,7 +40,7 @@
 
     <!-- Hero Header -->
     <div class="hero-section">
-      <div class="price-badge">SPECIAL OFFER • 3KSH/DAY</div>
+      <div class="price-badge-pill">SPECIAL OFFER • 3KSH/DAY</div>
       <h1 class="hero-title">Hatch, Set & Enjoy<br>Your Video Tone</h1>
       <p class="hero-sub">Surprise every caller with glowing magic companions</p>
     </div>
@@ -225,6 +225,16 @@
 
     </div>
 
+    <!-- Footer Service Notes -->
+    <div class="service-notes">
+      <h3>VybCall Service Notes</h3>
+      <p>1. VybCall is a video ringback tone service that allows callers to view short video content while waiting for a call to be answered. No data charges apply during video playback in the call waiting period.</p>
+      <p>2. For the best service experience, please ensure that the device and network environment support the VybCall service.</p>
+      <p>3. Upon successful subscription, the service will be activated on the subscribed mobile number.</p>
+      <p>4. Each subscribed VybCall content item is charged and renewed daily until unsubscribed.</p>
+      <p>5. You may cancel the service at any time through the link below: <a href="https://vybcall.safaricom.com/user/#/" target="_blank">https://vybcall.safaricom.com/user/#/</a></p>
+    </div>
+
     <!-- Footer Compliance -->
     <div class="footer">
       <p style="margin-top: 8px;">© 2026 VybCall Video. All rights reserved.</p>
@@ -243,28 +253,10 @@
       <!-- Video element -->
       <video class="fullscreen-video" id="modalVideo" loop playsinline></video>
 
-      <!-- Audio control before play -->
-      <div class="audio-control-panel" id="audioControlPanel">
-        <div class="audio-control-title">Choose Audio Mode</div>
-        <div class="audio-options">
-          <button class="audio-option-btn" data-muted="true">
-            <span class="audio-icon">🔇</span>
-            <span class="audio-label">Muted</span>
-          </button>
-          <button class="audio-option-btn" data-muted="false">
-            <span class="audio-icon">🔊</span>
-            <span class="audio-label">With Sound</span>
-          </button>
-        </div>
-        <button class="btn-gold-glow" id="startPlayBtn" style="margin-top: 16px;">Start Playing</button>
-      </div>
-
       <!-- Video controls during play -->
-      <div class="video-player-controls" id="videoPlayerControls" style="display: none;">
+      <div class="video-player-controls" id="videoPlayerControls">
         <div class="control-top">
           <button class="player-control-btn" id="modalMuteBtn">🔇</button>
-        </div>
-        <div class="control-bottom">
           <button class="player-control-btn" id="modalPlayPauseBtn">⏸</button>
         </div>
       </div>
@@ -273,7 +265,6 @@
       <div class="fs-info-bar" id="fsInfoBar">
         <div class="fs-info-text">
           <div class="fs-tone-name" id="fsToneName">Video Ringtone</div>
-          <div class="fs-tone-price">3 KSH/day</div>
         </div>
         <button class="btn-gold-glow fs-subscribe-btn" id="fsSubscribeBtn">Subscribe Now</button>
       </div>
@@ -303,7 +294,7 @@
         <img class="order-summary-thumb" id="verifyToneThumb" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=200&h=260&fit=crop" alt="Tone">
         <div class="order-summary-info">
           <div class="order-summary-title" id="verifyToneName">Magic Companion</div>
-          <div class="order-summary-price">Video Ringtone • 3 KSH/day</div>
+          <div class="order-summary-subtitle">Video Ringtone</div>
         </div>
       </div>
 
